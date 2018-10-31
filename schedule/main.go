@@ -125,9 +125,10 @@ func daemonf(device string, dao *Dao) {
 		log.Println(err)
 		return
 	}
-	for _, s := range sch {
+	for i, _ := range sch {
 		go func() {
 			for {
+				s := sch[i]
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
 				log.Printf("Next time for %d (%s) %s\n", s.Id, s.Action, expr.Format("Mon Jan _2 15:04:05 2006"))
 				time.Sleep(expr.Sub(time.Now()))
