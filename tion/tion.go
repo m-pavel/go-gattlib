@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-errors/errors"
 	"github.com/m-pavel/go-gattlib/pkg"
 )
 
@@ -15,15 +16,19 @@ const (
 type StatusHandler func(*Status)
 
 type Tion struct {
-	g    *gattlib.Gatt
-	Addr string
-	sc   chan int
-	ls   *Status
-	sh   StatusHandler
+	g        *gattlib.Gatt
+	Addr     string
+	sc       chan int
+	ls       *Status
+	sh       StatusHandler
+	interval int
 }
 
-func New(addr string) *Tion {
-	t := Tion{Addr: addr, g: &gattlib.Gatt{}}
+func New(addr string, interval ...int) *Tion {
+	t := Tion{Addr: addr, g: &gattlib.Gatt{}, interval: 10}
+	if len(interval) == 1 && interval[0] > 4 {
+		t.interval = interval[0]
+	}
 	return &t
 }
 
@@ -54,7 +59,7 @@ func (t *Tion) startStatusLoop() {
 		log.Println("Already running")
 		return
 	}
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(time.Duration(t.interval) * time.Second)
 	t.sc = make(chan int)
 	go func() {
 		for {
@@ -102,12 +107,17 @@ func (t *Tion) Status() Status {
 	return *t.ls
 }
 func (t *Tion) On() error {
+	if t.ls == nil {
+		return errors.New("Current state not retrieved yet")
+	}
 	rq := BuildRequest(true, t.ls.SoundEnabled, t.ls.HeaterEnabled, t.ls.Speed, t.ls.Gate, t.ls.TempTarget)
 	return t.g.Write(wchar, rq)
 }
 
 func (t *Tion) Off() error {
-	log.Println(t.ls)
+	if t.ls == nil {
+		return errors.New("Current state not retrieved yet")
+	}
 	rq := BuildRequest(false, t.ls.SoundEnabled, t.ls.HeaterEnabled, t.ls.Speed, t.ls.Gate, t.ls.TempTarget)
 	return t.g.Write(wchar, rq)
 

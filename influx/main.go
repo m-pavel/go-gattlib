@@ -22,7 +22,7 @@ func main() {
 	var notdaemonize = flag.Bool("n", false, "Do not do to background.")
 	var signal = flag.String("s", "", `send signal to the daemon stop — shutdown`)
 	var iserver = flag.String("influx", "http://localhost:8086", "Influx DB endpoint")
-	var nserver = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
+	var device = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
 	var interval = flag.Int("interval", 10, "Interval secons")
 	flag.Parse()
 	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
@@ -56,7 +56,7 @@ func main() {
 		}
 	}
 
-	daemonf(*iserver, *nserver, *interval)
+	daemonf(*iserver, *device, *interval)
 
 }
 

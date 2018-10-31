@@ -10,7 +10,8 @@ test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
 
 build: deps
-	${GF} go build -o influx-cli ./influx
+	${GF} go build -o tion-influx-cli ./influx
+	${GF} go build -o tion-schedule ./schedule
 
 gattlib:
 	git clone https://github.com/labapart/gattlib
