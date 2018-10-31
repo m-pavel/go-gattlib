@@ -5,7 +5,7 @@ GF=CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} LD_LIBRARY_PATH=${PWD}/ga
 all: gattlib test build
 
 deps:
-	${GF} go get -v ./...
+	${GF} go get -v -d ./...
 test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
 
