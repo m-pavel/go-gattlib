@@ -133,18 +133,25 @@ func daemonf(device string, dao *Dao) {
 				time.Sleep(expr.Sub(time.Now()))
 				log.Printf("Executing %d\n", s.Id)
 				t := tion.New(device)
-				if s.Action == "on" {
-					err := t.On()
-					if err != nil {
-						log.Println(err)
+				err = t.Connect()
+				if err != nil {
+					log.Println(err)
+				} else {
+					defer t.Disconnect()
+					if s.Action == "on" {
+						err := t.On()
+						if err != nil {
+							log.Println(err)
+						}
+					}
+					if s.Action == "off" {
+						t.Off()
+						if err != nil {
+							log.Println(err)
+						}
 					}
 				}
-				if s.Action == "off" {
-					t.Off()
-					if err != nil {
-						log.Println(err)
-					}
-				}
+
 			}
 		}(sch[i])
 	}
