@@ -137,7 +137,6 @@ func daemonf(device string, dao *Dao) {
 				if err != nil {
 					log.Println(err)
 				} else {
-					defer t.Disconnect()
 					if s.Action == "on" {
 						err := t.On()
 						if err != nil {
@@ -150,6 +149,7 @@ func daemonf(device string, dao *Dao) {
 							log.Println(err)
 						}
 					}
+					t.Disconnect()
 				}
 
 			}
