@@ -92,7 +92,7 @@ func daemonf(iserver, device string, interval int) {
 			},
 			time.Now())
 		if err != nil {
-			log.Println(err)
+			log.Printf("Insert data error: %v", err)
 			return
 		}
 		bp, err := client.NewBatchPoints(client.BatchPointsConfig{
@@ -100,12 +100,14 @@ func daemonf(iserver, device string, interval int) {
 			Precision: "s",
 		})
 		if err != nil {
-			log.Println("Insert data error:")
+			log.Printf("Insert data error: %v", err)
+			return
 		}
 		bp.AddPoint(point)
 		err = cli.Write(bp)
 		if err != nil {
-			log.Println("Insert data error:")
+			log.Printf("Insert data error: %v", err)
+			return
 		}
 	})
 
