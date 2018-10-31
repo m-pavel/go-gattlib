@@ -11,7 +11,6 @@ import (
 
 	"fmt"
 
-	"bitbucket.org/autogrowsystems/go-sdk/util/tell"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/m-pavel/go-gattlib/tion"
 	"github.com/sevlyar/go-daemon"
@@ -119,7 +118,7 @@ var (
 )
 
 func termHandler(sig os.Signal) error {
-	tell.Info("terminating...")
+	log.Println("terminating...")
 	stop <- struct{}{}
 	if sig == syscall.SIGQUIT {
 		<-done
