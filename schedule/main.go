@@ -126,9 +126,8 @@ func daemonf(device string, dao *Dao) {
 		return
 	}
 	for i, _ := range sch {
-		go func() {
+		go func(s Schedule) {
 			for {
-				s := sch[i]
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
 				log.Printf("Next time for %d (%s) %s\n", s.Id, s.Action, expr.Format("Mon Jan _2 15:04:05 2006"))
 				time.Sleep(expr.Sub(time.Now()))
@@ -147,7 +146,7 @@ func daemonf(device string, dao *Dao) {
 					}
 				}
 			}
-		}()
+		}(sch[i])
 	}
 	done <- struct{}{}
 }
