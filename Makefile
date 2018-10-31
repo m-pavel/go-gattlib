@@ -4,10 +4,12 @@ GF=CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} LD_LIBRARY_PATH=${PWD}/ga
 
 all: gattlib test build
 
-test:
+deps:
+	${GF} go get -v ./...
+test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
 
-build:
+build: deps
 	${GF} go build -o influx-cli ./influx
 
 gattlib:
