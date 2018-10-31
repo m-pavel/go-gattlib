@@ -44,7 +44,7 @@ func (g *Gatt) Disconnect() error {
 
 func (g *Gatt) Read(uuid string) ([]byte, int, error) {
 	buffer := make([]byte, 100)
-	var n C.ulong
+	var n C.size_t
 	n = 100
 	uuidS, err := g.uUID(uuid)
 	if err != nil {
@@ -64,7 +64,7 @@ func (g *Gatt) Write(uuid string, bf []byte) error {
 		return err
 	}
 
-	res := C.gattlib_write_char_by_uuid(g.conn, &uuidS.uuid, unsafe.Pointer(&bf[0]), C.ulong(len(bf)))
+	res := C.gattlib_write_char_by_uuid(g.conn, &uuidS.uuid, unsafe.Pointer(&bf[0]), C.size_t(len(bf)))
 	if res != 0 {
 		return errors.New(fmt.Sprintf("Error %d", res))
 	}
@@ -73,7 +73,7 @@ func (g *Gatt) Write(uuid string, bf []byte) error {
 
 func (g *Gatt) uUID(uuid string) (*UUID, error) {
 	var res UUID
-	ci := C.gattlib_string_to_uuid(C.CString(uuid), C.ulong(len(uuid)+1), &res.uuid)
+	ci := C.gattlib_string_to_uuid(C.CString(uuid), C.size_t(len(uuid)+1), &res.uuid)
 	if ci != 0 {
 		return nil, errors.New(strconv.Itoa(int(ci)))
 	} else {
