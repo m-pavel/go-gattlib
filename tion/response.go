@@ -39,6 +39,17 @@ func (s Status) GateStatus() string {
 	}
 }
 
+func (s *Status) SetGateStatus(str string) {
+	switch str {
+	case "indoor":
+		s.Gate = 0
+	case "mixed":
+		s.Gate = 1
+	case "outdoor":
+		s.Gate = 2
+	}
+}
+
 func FromBytes(bytes []byte) (*Status, error) {
 	if len(bytes) < 20 {
 		return nil, errors.New("Expecting 20 bytes array")

@@ -179,3 +179,7 @@ func (t *Tion) Off() error {
 	return t.g.Write(wchar, rq)
 
 }
+
+func (t *Tion) Update(s Status) error {
+	return t.g.Write(wchar, FromStatus(s))
+}
