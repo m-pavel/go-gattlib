@@ -28,12 +28,14 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println("Turned on")
 		break
 	case "off":
 		err := deviceCall(*device, func(t *tion.Tion) { t.Off() })
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println("Turned off")
 		break
 	case "":
 	case "status":
