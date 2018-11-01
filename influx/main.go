@@ -78,6 +78,10 @@ func daemonf(iserver, device string, interval int) {
 	defer tn.Disconnect()
 
 	tn.RegisterHandler(func(s *tion.Status) {
+		status := 0
+		if s.Enabled {
+			status = 1
+		}
 		point, err := client.NewPoint("tion",
 			map[string]string{
 				"gate":   strconv.Itoa(int(s.Gate)),
@@ -85,10 +89,11 @@ func daemonf(iserver, device string, interval int) {
 				"heater": fmt.Sprintf("%v", s.HeaterEnabled),
 			},
 			map[string]interface{}{
-				"out": s.TempIn,
-				"in":  s.TempOut,
-				"tgt": s.TempTarget,
-				"spd": s.Speed,
+				"out":    s.TempIn,
+				"in":     s.TempOut,
+				"tgt":    s.TempTarget,
+				"spd":    s.Speed,
+				"status": status,
 			},
 			time.Now())
 		if err != nil {
