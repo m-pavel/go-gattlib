@@ -3,6 +3,11 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
+
+	"github.com/go-ble/ble"
+
+	"github.com/m-pavel/go-gattlib/pkg"
 
 	"github.com/m-pavel/go-gattlib/tion"
 )
@@ -19,34 +24,16 @@ func main() {
 	}
 	switch *action {
 	case "on":
-		t := tion.New(*device)
-		err := t.Connect()
+		err := deviceCall(*device, func(t *tion.Tion) { t.On() })
 		if err != nil {
 			log.Println(err)
-			return
 		}
-		defer t.Disconnect()
-		err = t.On()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		log.Println("Turned on")
 		break
 	case "off":
-		t := tion.New(*device)
-		err := t.Connect()
+		err := deviceCall(*device, func(t *tion.Tion) { t.Off() })
 		if err != nil {
 			log.Println(err)
-			return
 		}
-		defer t.Disconnect()
-		err = t.Off()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		log.Println("Turned off")
 		break
 	case "":
 	case "status":
@@ -57,5 +44,30 @@ func main() {
 		}
 		log.Println(state)
 		break
+	case "scan":
+		scan()
+		return
 	}
+}
+
+func deviceCall(addr string, cb func(*tion.Tion)) error {
+	t := tion.New(addr)
+	err := t.Connect()
+	if err != nil {
+		return err
+	}
+	defer t.Disconnect()
+	cb(t)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func scan() {
+	log.Println("Scan")
+	gattlib.Scan(func(ad ble.Advertisement) {
+		log.Printf("%s %s", ad.Addr(), ad.LocalName())
+	}, 5)
+	time.Sleep(10 * time.Second)
 }

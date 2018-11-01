@@ -1,11 +1,9 @@
 package gattlib
 
-import "C"
-
 // #cgo CFLAGS: -g -Wall
 // #cgo LDFLAGS: -lgattlib
-// #include <stdlib.h>
 // #include <gattlib.h>
+// #include <stdlib.h>
 import "C"
 import (
 	"errors"
@@ -28,6 +26,7 @@ func (g Gatt) Connected() bool {
 
 func (g *Gatt) Connect(addr string) error {
 	str := C.CString(addr)
+	defer C.free(unsafe.Pointer(str))
 	g.conn = C.gattlib_connect(nil, str, C.BDADDR_LE_PUBLIC, C.BT_SEC_LOW, 0, 0)
 	if g.conn == nil {
 		return errors.New("Unable to connect")
@@ -77,7 +76,9 @@ func (g *Gatt) Write(uuid string, bf []byte) error {
 
 func (g *Gatt) uUID(uuid string) (*UUID, error) {
 	var res UUID
-	ci := C.gattlib_string_to_uuid(C.CString(uuid), C.size_t(len(uuid)+1), &res.uuid)
+	cuuid := C.CString(uuid)
+	defer C.free(unsafe.Pointer(cuuid))
+	ci := C.gattlib_string_to_uuid(cuuid, C.size_t(len(uuid)+1), &res.uuid)
 	if ci != 0 {
 		return nil, errors.New(strconv.Itoa(int(ci)))
 	} else {
