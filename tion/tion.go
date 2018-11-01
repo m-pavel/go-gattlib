@@ -104,7 +104,7 @@ func (t *Tion) startStatusLoop() {
 				log.Println("Tick")
 				err := t.updateState()
 				if err != nil {
-					gerr, ok := err.(gattlib.GattErr)
+					gerr, ok := err.(*gattlib.GattErr)
 					if ok {
 						log.Printf("Ok %v %v\n", t.reconnect, gerr.Id)
 						if gerr.Id == -1 && t.reconnect {
