@@ -42,7 +42,9 @@ func main() {
 			log.Println(err)
 			return
 		}
-		log.Println(state)
+		log.Printf("Staus: %v Heater: %v Sound: %v\n", state.Enabled, state.HeaterEnabled, state.SoundEnabled)
+		log.Printf("Target: %v In: %v Out: %v\n", state.TempTarget, state.TempIn, state.TempOut)
+		log.Printf("Gate: %d, Error: %d\n", state.Gate, state.ErrorCode)
 		break
 	case "scan":
 		scan()
