@@ -26,6 +26,19 @@ type Status struct {
 	Todo            byte
 }
 
+func (s Status) GateStatus() string {
+	switch s.Gate {
+	case 0:
+		return "indoor"
+	case 1:
+		return "mixed"
+	case 2:
+		return "outdoor"
+	default:
+		return "unknown"
+	}
+}
+
 func FromBytes(bytes []byte) (*Status, error) {
 	if len(bytes) < 20 {
 		return nil, errors.New("Expecting 20 bytes array")

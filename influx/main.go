@@ -7,8 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"strconv"
-
 	"fmt"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -85,7 +83,7 @@ func daemonf(iserver, device string, interval int) {
 		}
 		point, err := client.NewPoint("tion",
 			map[string]string{
-				"gate":   strconv.Itoa(int(s.Gate)),
+				"gate":   s.GateStatus(),
 				"on":     fmt.Sprintf("%v", s.Enabled),
 				"heater": fmt.Sprintf("%v", s.HeaterEnabled),
 			},
