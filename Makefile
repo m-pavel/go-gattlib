@@ -26,6 +26,6 @@ gattlib-clean:
 clean: gattlib-clean
 	rm -f ./tion-influx-cli
 	rm -f ./tion-schedule
-	rm -f ./tion-cli
+	rm -f ./cli
 
 
