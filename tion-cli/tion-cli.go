@@ -21,6 +21,9 @@ func main() {
 	var on = flag.Bool("on", false, "Turn on")
 	var off = flag.Bool("off", false, "Turn off")
 	var temp = flag.Int("temp", 0, "Set target temperature")
+	var speed = flag.Int("speed", 0, "Set speed")
+	var sound = flag.String("sound", "", "Sound on|off")
+	var heater = flag.String("heater", "", "Heater on|off")
 	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
@@ -60,6 +63,22 @@ func main() {
 		return
 	}
 
+	if *speed != 0 {
+		if *speed <= 0 || *speed > 6 {
+			log.Println("Speed range 1..6")
+			return
+		}
+		deviceCall(*device, func(t *tion.Tion) {
+			s := t.Status()
+			s.Speed = byte(*speed)
+			err := t.Update(s)
+			if err != nil {
+				log.Println(err)
+			}
+		}, fmt.Sprintf("Speed updated to %d", *speed))
+		return
+	}
+
 	if *gate != "" {
 		deviceCall(*device, func(t *tion.Tion) {
 			s := t.Status()
@@ -68,9 +87,42 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-		}, fmt.Sprintf("TGate set to %s", *gate))
+		}, fmt.Sprintf("Gate set to %s", *gate))
 		return
 	}
+
+	if *sound != "" {
+		deviceCall(*device, func(t *tion.Tion) {
+			s := t.Status()
+			if *sound == "on" {
+				s.SoundEnabled = true
+			} else {
+				s.SoundEnabled = false
+			}
+			err := t.Update(s)
+			if err != nil {
+				log.Println(err)
+			}
+		}, fmt.Sprintf("Sound set to %s", *sound))
+		return
+	}
+
+	if *heater != "" {
+		deviceCall(*device, func(t *tion.Tion) {
+			s := t.Status()
+			if *heater == "on" {
+				s.HeaterEnabled = true
+			} else {
+				s.HeaterEnabled = false
+			}
+			err := t.Update(s)
+			if err != nil {
+				log.Println(err)
+			}
+		}, fmt.Sprintf("Heater set to %s", *heater))
+		return
+	}
+
 	if *scanp {
 		scan()
 		return
