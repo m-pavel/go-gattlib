@@ -106,7 +106,7 @@ func (t *Tion) startStatusLoop() {
 				if err != nil {
 					gerr, ok := err.(gattlib.GattErr)
 					if ok {
-						if gerr.Id == 1 && t.reconnect {
+						if gerr.Id == -1 && t.reconnect {
 							t.selfreconnect()
 						}
 					}
