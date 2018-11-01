@@ -12,7 +12,7 @@ test: deps
 build: deps
 	${GF} go build -o tion-influx-cli ./influx
 	${GF} go build -o tion-schedule ./schedule
-	${GF} go build -o tion-cli ./tion-cli
+	${GF} go build -o cli ./tion-cli
 
 gattlib:
 	git clone https://github.com/labapart/gattlib
