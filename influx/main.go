@@ -71,7 +71,7 @@ func daemonf(iserver, device string, interval int) {
 	defer cli.Close()
 
 	tn := tion.New(device)
-	err = tn.Connect()
+	err = tn.Connect(true)
 	if err != nil {
 		log.Fatal(err)
 	}
