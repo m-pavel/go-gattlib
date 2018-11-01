@@ -15,7 +15,6 @@ import (
 func main() {
 	var device = flag.String("device", "", "bt addr")
 	var action = flag.String("action", "daemon", "scan|on|off|status")
-	//var value = flag.String("value", "", "schedule or id")
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
@@ -74,7 +73,6 @@ func deviceCall(addr string, cb func(*tion.Tion)) error {
 }
 
 func scan() {
-	log.Println("Scan")
 	gattlib.Scan(func(ad ble.Advertisement) {
 		log.Printf("%s %s", ad.Addr(), ad.LocalName())
 	}, 5)
