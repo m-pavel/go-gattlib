@@ -56,7 +56,7 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-		}, fmt.Sprintf("Target temperature updated to %d", v))
+		}, fmt.Sprintf("Target temperature updated to %d", *temp))
 		return
 	}
 
