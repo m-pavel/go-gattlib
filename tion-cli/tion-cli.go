@@ -49,7 +49,7 @@ func main() {
 			log.Println(err)
 			return
 		}
-		log.Printf("Staus: %v Heater: %v Sound: %v\n", state.Enabled, state.HeaterEnabled, state.SoundEnabled)
+		log.Printf("Status: %v Heater: %v Sound: %v\n", state.Enabled, state.HeaterEnabled, state.SoundEnabled)
 		log.Printf("Target: %v In: %v Out: %v\n", state.TempTarget, state.TempIn, state.TempOut)
 		log.Printf("Gate: %s, Error: %d\n", state.GateStatus(), state.ErrorCode)
 		break
