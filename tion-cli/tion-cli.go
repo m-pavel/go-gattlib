@@ -10,7 +10,7 @@ import (
 func main() {
 	var device = flag.String("device", "", "bt addr")
 	var action = flag.String("action", "daemon", "daemon|prepare|list|add|del")
-	var value = flag.String("value", "", "schedule or id")
+	//var value = flag.String("value", "", "schedule or id")
 	flag.Parse()
 	log.SetFlags(log.Lshortfile)
 
