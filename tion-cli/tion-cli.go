@@ -31,7 +31,12 @@ func main() {
 		log.Println("Turned on")
 		break
 	case "off":
-		err := deviceCall(*device, func(t *tion.Tion) { t.Off() })
+		err := deviceCall(*device, func(t *tion.Tion) {
+			err := t.Off()
+			if err != nil {
+				log.Println(err)
+			}
+		})
 		if err != nil {
 			log.Println(err)
 		}
