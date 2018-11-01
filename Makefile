@@ -15,7 +15,7 @@ build-cli: deps
 build-influx: deps
 	${GF} go build -o tion-influx-cli ./influx
 
-build-schedulei: deps
+build-schedule: deps
 	${GF} go build -o tion-schedule ./schedule
 
 build: build-cli build-influx build-schedule
