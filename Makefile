@@ -10,7 +10,7 @@ test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
 
 build: deps
-	${GF} go build -work -o tion-influx-cli ./influx
+	${GF} go build -o tion-influx-cli ./influx
 	${GF} go build -o tion-schedule ./schedule
 	${GF} go build -o cli ./tion-cli 
 
