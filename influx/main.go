@@ -26,6 +26,7 @@ func main() {
 	var interval = flag.Int("interval", 10, "Interval secons")
 	flag.Parse()
 	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
+	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
 	cntxt := &daemon.Context{
 		PidFileName: *pid,

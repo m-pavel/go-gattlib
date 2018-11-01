@@ -58,6 +58,7 @@ func (t *Tion) Disconnect() error {
 }
 
 func (t *Tion) selfreconnect() error {
+	log.Println("reconnecting")
 	if t.g != nil {
 		t.g.Disconnect()
 	}

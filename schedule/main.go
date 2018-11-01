@@ -32,7 +32,7 @@ func main() {
 	var act = flag.String("act", "", "act")
 	//var interval = flag.Int("interval", 10, "Interval secons")
 	flag.Parse()
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
 	dao, err := New(*db)
 	if err != nil {

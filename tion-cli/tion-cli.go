@@ -17,7 +17,7 @@ func main() {
 	var action = flag.String("action", "daemon", "scan|on|off|status")
 	//var value = flag.String("value", "", "schedule or id")
 	flag.Parse()
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
 	if *device == "" && *action != "scan" {
 		log.Fatal("Device address is mandatory")
