@@ -22,6 +22,10 @@ type UUID struct {
 	uuid C.uuid_t
 }
 
+func (g Gatt) Connected() bool {
+	return g.conn != nil
+}
+
 func (g *Gatt) Connect(addr string) error {
 	str := C.CString(addr)
 	g.conn = C.gattlib_connect(nil, str, C.BDADDR_LE_PUBLIC, C.BT_SEC_LOW, 0, 0)

@@ -33,6 +33,9 @@ func New(addr string, interval ...int) *Tion {
 }
 
 func (t *Tion) Connect() error {
+	if t.Connected() {
+		return errors.New("Already connected")
+	}
 	err := t.g.Connect(t.Addr)
 	if err != nil {
 		return err
@@ -48,6 +51,23 @@ func (t *Tion) Disconnect() error {
 		t.g = nil
 	}
 	return nil
+}
+
+// ReadState witout keeping connection open
+// Must be not connected before execution
+func (t *Tion) ReadState(timeout ...int) (*Status, error) {
+	if t.g.Connected() {
+		return nil, errors.New("Already connected")
+	}
+	if t.sc != nil {
+		return nil, errors.New("Loop already running")
+	}
+	err := t.g.Connect(t.Addr)
+	if err != nil {
+		return nil, err
+	}
+	defer t.g.Disconnect()
+	return t.rw()
 }
 
 func (t *Tion) RegisterHandler(h StatusHandler) {
@@ -84,6 +104,9 @@ func (t *Tion) startStatusLoop() {
 }
 
 func (t *Tion) rw() (*Status, error) {
+	if !t.Connected() {
+		return nil, errors.New("Not connected")
+	}
 	err := t.g.Write(wchar, statusRequest)
 	time.Sleep(time.Second)
 	resp, _, err := t.g.Read(rchar)
@@ -106,6 +129,11 @@ func (t *Tion) stopStatusLoop() {
 func (t *Tion) Status() Status {
 	return *t.ls
 }
+
+func (t Tion) Connected() bool {
+	return t.g != nil && t.g.Connected()
+}
+
 func (t *Tion) On() error {
 	if t.ls == nil {
 		return errors.New("Current state not retrieved yet")
