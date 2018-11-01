@@ -79,6 +79,10 @@ func (t *Tion) startStatusLoop() {
 		log.Println("Already running")
 		return
 	}
+	err := t.updateState()
+	if err != nil {
+		log.Println(err)
+	}
 	ticker := time.NewTicker(time.Duration(t.interval) * time.Second)
 	t.sc = make(chan int)
 	go func() {
@@ -86,13 +90,8 @@ func (t *Tion) startStatusLoop() {
 			select {
 			case <-ticker.C:
 				log.Println("Tick")
-				s, err := t.rw()
-				if err == nil {
-					t.ls = s
-					if t.sh != nil {
-						t.sh(s)
-					}
-				} else {
+				err := t.updateState()
+				if err != nil {
 					log.Println(err)
 				}
 			case <-t.sc:
@@ -103,6 +102,18 @@ func (t *Tion) startStatusLoop() {
 	}()
 }
 
+func (t *Tion) updateState() error {
+	s, err := t.rw()
+	if err == nil {
+		t.ls = s
+		if t.sh != nil {
+			t.sh(s)
+		}
+		return nil
+	} else {
+		return err
+	}
+}
 func (t *Tion) rw() (*Status, error) {
 	if !t.Connected() {
 		return nil, errors.New("Not connected")
