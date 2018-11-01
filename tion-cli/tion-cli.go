@@ -94,6 +94,7 @@ func sts(b bool) string {
 	}
 	return "off"
 }
+
 func deviceCall(addr string, cb func(*tion.Tion), succ string) error {
 	t := tion.New(addr)
 	err := t.Connect()

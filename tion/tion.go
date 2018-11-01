@@ -108,7 +108,12 @@ func (t *Tion) startStatusLoop() {
 					if ok {
 						if gerr.Id == -1 && t.reconnect {
 							t.selfreconnect()
+							continue
 						}
+					}
+					if !t.Connected() && t.reconnect {
+						t.selfreconnect()
+						continue
 					}
 					log.Println(err)
 				}
