@@ -9,8 +9,6 @@ import (
 
 	"github.com/m-pavel/go-gattlib/pkg"
 
-	"strconv"
-
 	"fmt"
 
 	"github.com/m-pavel/go-gattlib/tion"
@@ -22,9 +20,8 @@ func main() {
 	var scanp = flag.Bool("scan", false, "Perform scan")
 	var on = flag.Bool("on", false, "Turn on")
 	var off = flag.Bool("off", false, "Turn off")
-	var temp = flag.Bool("temp", false, "Set target temperature")
-	var gate = flag.Bool("gate", false, "Set gate position(indoor|outdoor|mixed)")
-	var value = flag.String("val", "", "Value")
+	var temp = flag.Int("temp", 0, "Set target temperature")
+	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
@@ -51,15 +48,10 @@ func main() {
 		}, "Turned off")
 		return
 	}
-	if *temp {
-		v, err := strconv.Atoi(*value)
-		if err != nil {
-			log.Println(err)
-			return
-		}
+	if *temp != 0 {
 		deviceCall(*device, func(t *tion.Tion) {
 			s := t.Status()
-			s.TempTarget = byte(v)
+			s.TempTarget = byte(*temp)
 			err := t.Update(s)
 			if err != nil {
 				log.Println(err)
@@ -68,15 +60,15 @@ func main() {
 		return
 	}
 
-	if *gate {
+	if *gate != "" {
 		deviceCall(*device, func(t *tion.Tion) {
 			s := t.Status()
-			s.SetGateStatus(*value)
+			s.SetGateStatus(*gate)
 			err := t.Update(s)
 			if err != nil {
 				log.Println(err)
 			}
-		}, fmt.Sprintf("TGate set to %s", *value))
+		}, fmt.Sprintf("TGate set to %s", *gate))
 		return
 	}
 	if *scanp {
