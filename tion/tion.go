@@ -16,12 +16,13 @@ const (
 type StatusHandler func(*Status)
 
 type Tion struct {
-	g        *gattlib.Gatt
-	Addr     string
-	sc       chan int
-	ls       *Status
-	sh       StatusHandler
-	interval int
+	g         *gattlib.Gatt
+	Addr      string
+	sc        chan int
+	ls        *Status
+	sh        StatusHandler
+	interval  int
+	reconnect bool
 }
 
 func New(addr string, interval ...int) *Tion {
@@ -32,13 +33,16 @@ func New(addr string, interval ...int) *Tion {
 	return &t
 }
 
-func (t *Tion) Connect() error {
+func (t *Tion) Connect(reconnect ...bool) error {
 	if t.Connected() {
 		return errors.New("Already connected")
 	}
 	err := t.g.Connect(t.Addr)
 	if err != nil {
 		return err
+	}
+	if len(reconnect) == 1 {
+		t.reconnect = reconnect[0]
 	}
 	t.startStatusLoop()
 	return nil
@@ -51,6 +55,13 @@ func (t *Tion) Disconnect() error {
 		t.g = nil
 	}
 	return nil
+}
+
+func (t *Tion) selfreconnect() error {
+	if t.g != nil {
+		t.g.Disconnect()
+	}
+	return t.g.Connect(t.Addr)
 }
 
 // ReadState witout keeping connection open
@@ -92,6 +103,12 @@ func (t *Tion) startStatusLoop() {
 				log.Println("Tick")
 				err := t.updateState()
 				if err != nil {
+					gerr, ok := err.(gattlib.GattErr)
+					if ok {
+						if gerr.Id == 1 && t.reconnect {
+							t.selfreconnect()
+						}
+					}
 					log.Println(err)
 				}
 			case <-t.sc:

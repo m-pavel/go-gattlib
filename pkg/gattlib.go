@@ -7,8 +7,6 @@ package gattlib
 import "C"
 import (
 	"errors"
-	"fmt"
-	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -40,7 +38,7 @@ func (g *Gatt) Disconnect() error {
 		res := C.gattlib_disconnect(g.conn)
 		g.conn = nil
 		if res != 0 {
-			return errors.New(fmt.Sprintf("Error %d", res))
+			return GattError(int(res))
 		}
 	}
 	return nil
@@ -57,7 +55,7 @@ func (g *Gatt) Read(uuid string) ([]byte, int, error) {
 
 	res := C.gattlib_read_char_by_uuid(g.conn, &uuidS.uuid, unsafe.Pointer(&buffer[0]), &n)
 	if res != 0 {
-		return nil, 0, errors.New(fmt.Sprintf("Error %d", res))
+		return nil, 0, GattError(int(res))
 	}
 	return buffer, int(n), nil
 }
@@ -70,20 +68,19 @@ func (g *Gatt) Write(uuid string, bf []byte) error {
 
 	res := C.gattlib_write_char_by_uuid(g.conn, &uuidS.uuid, unsafe.Pointer(&bf[0]), C.size_t(len(bf)))
 	if res != 0 {
-		return errors.New(fmt.Sprintf("Error %d", res))
+		return GattError(int(res))
 	}
 	return nil
 }
 
 func (g *Gatt) uUID(uuid string) (*UUID, error) {
-	var res UUID
+	var rUUID UUID
 	cuuid := C.CString(uuid)
 	defer C.free(unsafe.Pointer(cuuid))
-	ci := C.gattlib_string_to_uuid(cuuid, C.size_t(len(uuid)+1), &res.uuid)
-	if ci != 0 {
-		return nil, errors.New(strconv.Itoa(int(ci)))
+	res := C.gattlib_string_to_uuid(cuuid, C.size_t(len(uuid)+1), &rUUID.uuid)
+	if res != 0 {
+		return nil, GattError(int(res))
 	} else {
-		return &res, nil
+		return &rUUID, nil
 	}
-
 }
