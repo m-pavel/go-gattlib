@@ -90,12 +90,18 @@ func main() {
 			log.Println(err)
 			return
 		}
-		log.Printf("Status: %v, Heater: %v, Sound: %v\n", state.Enabled, state.HeaterEnabled, state.SoundEnabled)
-		log.Printf("Target: %v, In: %v, Out: %v\n", state.TempTarget, state.TempIn, state.TempOut)
+		log.Printf("Status: %s, Heater: %s, Sound: %s\n", sts(state.Enabled), sts(state.HeaterEnabled), sts(state.SoundEnabled))
+		log.Printf("Target: %d\xB0, In: %d\xB0, Out: %d\xB0\n", state.TempTarget, state.TempIn, state.TempOut)
 		log.Printf("Gate: %s, Error: %d\n", state.GateStatus(), state.ErrorCode)
 	}
 }
 
+func sts(b bool) string {
+	if b {
+		return "on"
+	}
+	return "off"
+}
 func deviceCall(addr string, cb func(*tion.Tion), succ string) error {
 	t := tion.New(addr)
 	err := t.Connect()
