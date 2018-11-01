@@ -2,7 +2,6 @@ package tion
 
 import (
 	"bytes"
-	"log"
 )
 
 var (
@@ -39,6 +38,5 @@ func BuildRequest(enabled, sound, heater bool, speed, gate, temp byte) []byte {
 	bf.Write([]byte{0x00, 0x00})
 	bf.Write([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 	bf.WriteByte(0x5a)
-	log.Println(bf.Len())
 	return bf.Bytes()
 }
