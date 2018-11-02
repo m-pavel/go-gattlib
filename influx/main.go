@@ -26,7 +26,7 @@ func main() {
 	var signal = flag.String("s", "", `send signal to the daemon stop — shutdown`)
 	var iserver = flag.String("influx", "http://localhost:8086", "Influx DB endpoint")
 	var device = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
-	var interval = flag.Int("interval", 10, "Interval secons")
+	var interval = flag.Int("interval", 30, "Interval secons")
 	flag.Parse()
 	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
