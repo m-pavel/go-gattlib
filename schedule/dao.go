@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"strconv"
 
+	"github.com/gorhill/cronexpr"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -12,9 +12,14 @@ type Dao struct {
 }
 
 type Schedule struct {
-	Id     int
-	Value  string
-	Action string
+	Id      int
+	Value   string
+	Enabled *bool
+	Heater  *bool
+	Gate    *int
+	Speed   *int
+	Sound   *bool
+	Temp    *int
 }
 
 func New(db string) (*Dao, error) {
@@ -28,7 +33,7 @@ func New(db string) (*Dao, error) {
 }
 
 func (d *Dao) Prepare() error {
-	_, err := d.db.Exec("CREATE TABLE SCHEDULES (SCHEDULE text NOT NULL, ACTION test NOT NULL)")
+	_, err := d.db.Exec("CREATE TABLE SCHEDULES (SCHEDULE text NOT NULL, ENABLED int, HEATER int, SOUND int, GATE int, SPEED int, TEMP int)")
 	return err
 }
 
@@ -40,7 +45,7 @@ func (d *Dao) Close() {
 }
 
 func (d *Dao) GetSchedules() ([]Schedule, error) {
-	stmt, err := d.db.Prepare("SELECT ROWID, SCHEDULE, ACTION FROM SCHEDULES")
+	stmt, err := d.db.Prepare("SELECT ROWID, SCHEDULE, ENABLED, HEATER, SOUND, GATE, SPEED, TEMP FROM SCHEDULES")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +61,7 @@ func (d *Dao) GetSchedules() ([]Schedule, error) {
 			break
 		}
 		var s Schedule
-		rows.Scan(&s.Id, &s.Value, &s.Action)
+		rows.Scan(&s.Id, &s.Value, &s.Enabled, &s.Heater, &s.Sound, &s.Gate, &s.Speed, &s.Temp)
 		if err != nil {
 			return nil, err
 		}
@@ -65,13 +70,17 @@ func (d *Dao) GetSchedules() ([]Schedule, error) {
 	return sch, err
 }
 
-func (d *Dao) Add(schedule, action string) error {
-	_, err := d.db.Exec("INSERT INTO SCHEDULES VALUES (?, ?)", schedule, action)
+func (d *Dao) Add(schedule string, enabled *bool, heater *bool, sound *bool, gate *int, speed *int, temp *int) error {
+	_, err := cronexpr.Parse(schedule)
+	if err != nil {
+		return err
+	}
+	_, err = d.db.Exec("INSERT INTO SCHEDULES (SCHEDULE, ENABLED, HEATER, SOUND, GATE, SPEED, TEMP) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		schedule, enabled, heater, sound, gate, speed, temp)
 	return err
 }
 
-func (d *Dao) Delete(id string) error {
-	iid, _ := strconv.Atoi(id)
-	_, err := d.db.Exec("DELETE FROM SCHEDULES WHERE ROWID=?", iid)
+func (d *Dao) Delete(id int) error {
+	_, err := d.db.Exec("DELETE FROM SCHEDULES WHERE ROWID=?", id)
 	return err
 }

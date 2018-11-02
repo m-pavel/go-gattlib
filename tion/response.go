@@ -26,8 +26,8 @@ type Status struct {
 	Todo            byte
 }
 
-func (s Status) GateStatus() string {
-	switch s.Gate {
+func GateStatus(v byte) string {
+	switch v {
 	case 0:
 		return "indoor"
 	case 1:
@@ -37,6 +37,9 @@ func (s Status) GateStatus() string {
 	default:
 		return "unknown"
 	}
+}
+func (s Status) GateStatus() string {
+	return GateStatus(s.Gate)
 }
 
 func (s *Status) SetGateStatus(str string) {

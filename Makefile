@@ -10,7 +10,7 @@ test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
 
 build-cli: deps
-	${GF} go build -o cli ./tion-cli 
+	${GF} go build -o tion-cli ./cli
 
 build-influx: deps
 	${GF} go build -o tion-influx-cli ./influx
@@ -32,4 +32,4 @@ gattlib-clean:
 clean: gattlib-clean
 	rm -f ./tion-influx-cli
 	rm -f ./tion-schedule
-	rm -f ./cli
+	rm -f ./tion-cli
