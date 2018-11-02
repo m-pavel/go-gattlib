@@ -156,13 +156,11 @@ func (t *Tion) rw() (*Status, error) {
 }
 
 func (t *Tion) stopStatusLoop() {
-	if t.sc == nil {
-		log.Println("Not running")
-		return
+	if t.sc != nil {
+		t.sc <- 1
+		close(t.sc)
+		t.sc = nil
 	}
-	t.sc <- 1
-	close(t.sc)
-	t.sc = nil
 }
 
 func (t *Tion) Status() *Status {
