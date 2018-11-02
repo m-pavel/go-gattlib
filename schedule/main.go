@@ -209,6 +209,7 @@ func execute(s Schedule, device string) error {
 	if err != nil {
 		return err
 	}
+	defer t.Disconnect()
 	ts, err := t.ReadState(10)
 	if err != nil {
 		return err
@@ -236,7 +237,7 @@ func execute(s Schedule, device string) error {
 	if err != nil {
 		return err
 	}
-	return t.Disconnect()
+	return nil
 }
 
 func termHandler(sig os.Signal) error {
