@@ -33,32 +33,23 @@ func main() {
 	}
 
 	if *on {
-		deviceCall(*device, func(t *tion.Tion) {
-			err := t.On()
-			if err != nil {
-				log.Println(err)
-			}
+		deviceCall(*device, func(t *tion.Tion) error {
+			return t.On()
 		}, "Turned on")
 
 		return
 	}
 	if *off {
-		deviceCall(*device, func(t *tion.Tion) {
-			err := t.Off()
-			if err != nil {
-				log.Println(err)
-			}
+		deviceCall(*device, func(t *tion.Tion) error {
+			return t.Off()
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
-		deviceCall(*device, func(t *tion.Tion) {
+		deviceCall(*device, func(t *tion.Tion) error {
 			s := t.Status()
 			s.TempTarget = byte(*temp)
-			err := t.Update(s)
-			if err != nil {
-				log.Println(err)
-			}
+			return t.Update(s)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
 		return
 	}
@@ -68,57 +59,45 @@ func main() {
 			log.Println("Speed range 1..6")
 			return
 		}
-		deviceCall(*device, func(t *tion.Tion) {
+		deviceCall(*device, func(t *tion.Tion) error {
 			s := t.Status()
 			s.Speed = byte(*speed)
-			err := t.Update(s)
-			if err != nil {
-				log.Println(err)
-			}
+			return t.Update(s)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
 		return
 	}
 
 	if *gate != "" {
-		deviceCall(*device, func(t *tion.Tion) {
+		deviceCall(*device, func(t *tion.Tion) error {
 			s := t.Status()
 			s.SetGateStatus(*gate)
-			err := t.Update(s)
-			if err != nil {
-				log.Println(err)
-			}
+			return t.Update(s)
 		}, fmt.Sprintf("Gate set to %s", *gate))
 		return
 	}
 
 	if *sound != "" {
-		deviceCall(*device, func(t *tion.Tion) {
+		deviceCall(*device, func(t *tion.Tion) error {
 			s := t.Status()
 			if *sound == "on" {
 				s.SoundEnabled = true
 			} else {
 				s.SoundEnabled = false
 			}
-			err := t.Update(s)
-			if err != nil {
-				log.Println(err)
-			}
+			return t.Update(s)
 		}, fmt.Sprintf("Sound set to %s", *sound))
 		return
 	}
 
 	if *heater != "" {
-		deviceCall(*device, func(t *tion.Tion) {
+		deviceCall(*device, func(t *tion.Tion) error {
 			s := t.Status()
 			if *heater == "on" {
 				s.HeaterEnabled = true
 			} else {
 				s.HeaterEnabled = false
 			}
-			err := t.Update(s)
-			if err != nil {
-				log.Println(err)
-			}
+			return t.Update(s)
 		}, fmt.Sprintf("Heater set to %s", *heater))
 		return
 	}
@@ -147,14 +126,14 @@ func sts(b bool) string {
 	return "off"
 }
 
-func deviceCall(addr string, cb func(*tion.Tion), succ string) error {
+func deviceCall(addr string, cb func(*tion.Tion) error, succ string) error {
 	t := tion.New(addr)
 	err := t.Connect()
 	if err != nil {
 		return err
 	}
 	defer t.Disconnect()
-	cb(t)
+	err = cb(t)
 	if err != nil {
 		log.Println(err)
 	} else {
