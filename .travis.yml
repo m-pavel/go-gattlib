@@ -1,3 +1,6 @@
 language: go
+
+dist: trusty
+
 before_install:
   - sudo apt-get install -y libbluetooth-dev
