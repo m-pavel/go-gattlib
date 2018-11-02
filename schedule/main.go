@@ -197,14 +197,19 @@ func daemonf(device string, dao *Dao, repeat int) {
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
 				mins := expr.Sub(time.Now()) / time.Minute
 				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.Id, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
-				time.Sleep(expr.Sub(time.Now()))
-				log.Printf("Executing %d\n", s.Id)
-				for i := 0; i < repeat; i++ {
-					err := execute(s, device)
-					if err != nil {
-						log.Println(err)
-					} else {
-						break
+				select {
+				case <-stop:
+					log.Println("Exiting")
+					break
+				case <-time.After(expr.Sub(time.Now())):
+					log.Printf("Executing %d\n", s.Id)
+					for i := 0; i < repeat; i++ {
+						err := execute(s, device)
+						if err != nil {
+							log.Println(err)
+						} else {
+							break
+						}
 					}
 				}
 			}
