@@ -196,7 +196,10 @@ func daemonf(device string, dao *Dao) {
 				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.Id, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
 				time.Sleep(expr.Sub(time.Now()))
 				log.Printf("Executing %d\n", s.Id)
-				execute(s, device)
+				err := execute(s, device)
+				if err != nil {
+					log.Println(err)
+				}
 			}
 		}(sch[i])
 	}
