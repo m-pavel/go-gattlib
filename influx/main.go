@@ -14,6 +14,11 @@ import (
 	"github.com/sevlyar/go-daemon"
 )
 
+var (
+	stop = make(chan struct{})
+	done = make(chan struct{})
+)
+
 func main() {
 	var logf = flag.String("log", "influxexport.log", "log")
 	var pid = flag.String("pid", "influxexport.pid", "pid")
@@ -69,62 +74,65 @@ func daemonf(iserver, device string, interval int) {
 	}
 	defer cli.Close()
 
-	tn := tion.New(device)
-	err = tn.Connect(true)
-	if err != nil {
-		log.Fatal(err)
+	t := tion.New(device)
+	for {
+		select {
+		case <-stop:
+			log.Println("Exiting")
+			break
+		case <-time.After(time.Duration(interval) * time.Second):
+			s, err := t.ReadState(5)
+			if err != nil {
+				log.Println(err)
+			} else {
+				reportInflux(cli, s)
+			}
+		}
 	}
-	defer tn.Disconnect()
-
-	tn.RegisterHandler(func(s *tion.Status) {
-		status := 0
-		if s.Enabled {
-			status = 1
-		}
-		point, err := client.NewPoint("tion",
-			map[string]string{
-				"gate":   s.GateStatus(),
-				"on":     fmt.Sprintf("%v", s.Enabled),
-				"heater": fmt.Sprintf("%v", s.HeaterEnabled),
-			},
-			map[string]interface{}{
-				"out":    s.TempIn,
-				"in":     s.TempOut,
-				"tgt":    s.TempTarget,
-				"spd":    s.Speed,
-				"status": status,
-			},
-			time.Now())
-		if err != nil {
-			log.Printf("Insert data error: %v", err)
-			return
-		}
-		bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-			Database:  "tion",
-			Precision: "s",
-		})
-		if err != nil {
-			log.Printf("Insert data error: %v", err)
-			return
-		}
-		bp.AddPoint(point)
-		err = cli.Write(bp)
-		if err != nil {
-			log.Printf("Insert data error: %v", err)
-			return
-		}
-	})
 
 	done <- struct{}{}
 }
 
-var (
-	stop = make(chan struct{})
-	done = make(chan struct{})
-)
+func reportInflux(i client.Client, s *tion.Status) {
+	status := 0
+	if s.Enabled {
+		status = 1
+	}
+	point, err := client.NewPoint("tion",
+		map[string]string{
+			"gate":   s.GateStatus(),
+			"on":     fmt.Sprintf("%v", s.Enabled),
+			"heater": fmt.Sprintf("%v", s.HeaterEnabled),
+		},
+		map[string]interface{}{
+			"out":    s.TempIn,
+			"in":     s.TempOut,
+			"tgt":    s.TempTarget,
+			"spd":    s.Speed,
+			"status": status,
+		},
+		time.Now())
+	if err != nil {
+		log.Printf("Insert data error: %v", err)
+		return
+	}
+	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
+		Database:  "tion",
+		Precision: "s",
+	})
+	if err != nil {
+		log.Printf("Insert data error: %v", err)
+		return
+	}
+	bp.AddPoint(point)
+	err = i.Write(bp)
+	if err != nil {
+		log.Printf("Insert data error: %v", err)
+	}
+}
 
 func termHandler(sig os.Signal) error {
-	log.Println("terminating...")
+	log.Println("Terminating...")
 	stop <- struct{}{}
 	if sig == syscall.SIGQUIT {
 		<-done
