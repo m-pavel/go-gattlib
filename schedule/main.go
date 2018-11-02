@@ -233,6 +233,7 @@ func execute(s Schedule, device string) error {
 	if s.Sound != nil {
 		ts.SoundEnabled = *s.Sound
 	}
+	log.Println("Device request %v", ts)
 	err = t.Update(*ts)
 	if err != nil {
 		return err
