@@ -42,6 +42,8 @@ func main() {
 	var gate = flag.String("gate", "", "indoor|mixed|outdoor")
 	var speed = flag.Int("speed", -1, "speed")
 
+	var repeat = flag.Int("repeat", 3, "repeat")
+
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
@@ -169,7 +171,7 @@ func main() {
 		}
 	}
 
-	daemonf(*device, dao)
+	daemonf(*device, dao, *repeat)
 
 }
 
@@ -183,7 +185,7 @@ func fb(v *bool) string {
 	return "off"
 }
 
-func daemonf(device string, dao *Dao) {
+func daemonf(device string, dao *Dao, repeat int) {
 	sch, err := dao.GetSchedules()
 	if err != nil {
 		log.Println(err)
@@ -197,9 +199,13 @@ func daemonf(device string, dao *Dao) {
 				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.Id, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
 				time.Sleep(expr.Sub(time.Now()))
 				log.Printf("Executing %d\n", s.Id)
-				err := execute(s, device)
-				if err != nil {
-					log.Println(err)
+				for i := 0; i < repeat; i++ {
+					err := execute(s, device)
+					if err != nil {
+						log.Println(err)
+					} else {
+						break
+					}
 				}
 			}
 		}(sch[i])

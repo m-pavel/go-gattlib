@@ -87,7 +87,7 @@ func (t *Tion) ReadState(timeout ...int) (*Status, error) {
 }
 
 // RegisterHandler internal loop
-// Deprecated: this keeps connection closed
+// Deprecated: this keeps connection opened
 func (t *Tion) RegisterHandler(h StatusHandler) {
 	t.sh = h
 }
