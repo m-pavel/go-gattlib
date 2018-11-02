@@ -6,7 +6,6 @@ package gattlib
 // #include <stdlib.h>
 import "C"
 import (
-	"errors"
 	"strings"
 	"unsafe"
 )
@@ -26,9 +25,10 @@ func (g Gatt) Connected() bool {
 func (g *Gatt) Connect(addr string) error {
 	str := C.CString(strings.ToUpper(addr))
 	defer C.free(unsafe.Pointer(str))
-	g.conn = C.gattlib_connect(nil, str, C.BDADDR_LE_PUBLIC, C.BT_SEC_LOW, 0, 0)
+	var err error
+	g.conn, err = C.gattlib_connect(nil, str, C.BDADDR_LE_PUBLIC, C.BT_SEC_LOW, 0, 0)
 	if g.conn == nil {
-		return errors.New("Unable to connect")
+		return err
 	}
 	return nil
 }
