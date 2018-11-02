@@ -13,7 +13,7 @@ build-cli: deps
 	${GF} go build -o tion-cli ./cli
 
 build-influx: deps
-	${GF} go build -o tion-influx-cli ./influx
+	${GF} go build -o tion-influx ./influx
 
 build-schedule: deps
 	${GF} go build -o tion-schedule ./schedule
@@ -30,6 +30,6 @@ gattlib-clean:
 	rm -rf ./gattlib
 
 clean: gattlib-clean
-	rm -f ./tion-influx-cli
+	rm -f ./tion-influx
 	rm -f ./tion-schedule
 	rm -f ./tion-cli
