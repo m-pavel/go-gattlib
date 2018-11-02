@@ -54,8 +54,9 @@ func (t *Tion) Connect(startloop ...bool) error {
 func (t *Tion) Disconnect() error {
 	t.stopStatusLoop()
 	if t.g != nil {
-		return t.g.Disconnect()
+		err := t.g.Disconnect()
 		t.g = nil
+		return err
 	}
 	return nil
 }
