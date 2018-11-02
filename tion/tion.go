@@ -165,8 +165,8 @@ func (t *Tion) stopStatusLoop() {
 	t.sc = nil
 }
 
-func (t *Tion) Status() Status {
-	return *t.ls
+func (t *Tion) Status() *Status {
+	return t.ls
 }
 
 func (t Tion) Connected() bool {
@@ -190,6 +190,6 @@ func (t *Tion) Off() error {
 
 }
 
-func (t *Tion) Update(s Status) error {
+func (t *Tion) Update(s *Status) error {
 	return t.g.Write(wchar, FromStatus(s))
 }

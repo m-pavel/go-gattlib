@@ -11,6 +11,7 @@ import (
 
 	"fmt"
 
+	"github.com/go-errors/errors"
 	"github.com/gorhill/cronexpr"
 	"github.com/sevlyar/go-daemon"
 )
@@ -213,9 +214,9 @@ func execute(s Schedule, device string) error {
 		return err
 	}
 	defer t.Disconnect()
-	ts, err := t.ReadState(10)
-	if err != nil {
-		return err
+	ts := t.Status()
+	if ts == nil {
+		return errors.New("Status is nil")
 	}
 
 	if s.Enabled != nil {
@@ -237,7 +238,7 @@ func execute(s Schedule, device string) error {
 		ts.SoundEnabled = *s.Sound
 	}
 	log.Printf("Device request %v\n", ts)
-	err = t.Update(*ts)
+	err = t.Update(ts)
 	if err != nil {
 		return err
 	}
