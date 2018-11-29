@@ -11,22 +11,22 @@ type Status struct {
 	HeaterEnabled   bool
 	SoundEnabled    bool
 	TimerEnabled    bool
-	Speed           byte
-	Gate            byte // 0 - indoor, 1 - mixed, 2 - outdoor; when 0 than heater off; when 1 speed 1,2 unavailiable
-	TempTarget      byte
-	TempOut         byte // Outcoming from device - inside
-	TempIn          byte // Incoming to device - outside
+	Speed           int8
+	Gate            int8 // 0 - indoor, 1 - mixed, 2 - outdoor; when 0 than heater off; when 1 speed 1,2 unavailiable
+	TempTarget      int8
+	TempOut         int8 // Outcoming from device - inside
+	TempIn          int8 // Incoming to device - outside
 	FiltersRemains  int
-	Hours           byte
-	Minutes         byte
-	ErrorCode       byte
-	Productivity    byte //m3pH
+	Hours           int8
+	Minutes         int8
+	ErrorCode       int8
+	Productivity    int8 //m3pH
 	RunDays         int
 	FirmwareVersion int
-	Todo            byte
+	Todo            int8
 }
 
-func GateStatus(v byte) string {
+func GateStatus(v int8) string {
 	switch v {
 	case 0:
 		return "indoor"
@@ -61,9 +61,10 @@ func FromBytes(bytes []byte) (*Status, error) {
 
 	bt := rb(buffer)
 	tr := Status{}
-	tr.Speed = byte(int(bt) & 0xF)
+	tr.Speed = int8(int(bt) & 0xF)
 	tr.Gate = bt >> 4
-	tr.TempTarget, _ = buffer.ReadByte()
+	tmp, _ := buffer.ReadByte()
+	tr.TempTarget = int8(tmp)
 
 	bt = rb(buffer)
 	if bt&1 != 0 {
@@ -79,7 +80,6 @@ func FromBytes(bytes []byte) (*Status, error) {
 		tr.SoundEnabled = true
 	}
 	tr.Todo = rb(buffer)
-	//log.Println(tr.Todo)
 	tr.TempOut = (rb(buffer) + rb(buffer)) / 2
 	tr.TempIn = rb(buffer)
 	tr.FiltersRemains = ri(buffer)
@@ -92,9 +92,9 @@ func FromBytes(bytes []byte) (*Status, error) {
 	return &tr, nil
 }
 
-func rb(b *bytes2.Buffer) byte {
+func rb(b *bytes2.Buffer) int8 {
 	bt, _ := b.ReadByte()
-	return bt & 0xFF
+	return int8(bt & 0xFF)
 }
 
 func ri(b *bytes2.Buffer) int {

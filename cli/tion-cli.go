@@ -49,7 +49,7 @@ func main() {
 	if *temp != 0 {
 		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
-			s.TempTarget = byte(*temp)
+			s.TempTarget = int8(*temp)
 			return t.Update(s)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
 		return
@@ -62,7 +62,7 @@ func main() {
 		}
 		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
-			s.Speed = byte(*speed)
+			s.Speed = int8(*speed)
 			return t.Update(s)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
 		return

@@ -80,7 +80,7 @@ func main() {
 			if v == nil {
 				return "n/a"
 			}
-			return tion.GateStatus(byte(*v))
+			return tion.GateStatus(int8(*v))
 		}
 		for _, sch := range s {
 			fmt.Printf("%d | %s | %s | %s | %s | %v | %s | %s |\n", sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate))
@@ -234,13 +234,13 @@ func execute(s Schedule, device string) error {
 		ts.Enabled = *s.Enabled
 	}
 	if s.Gate != nil {
-		ts.Gate = byte(*s.Gate)
+		ts.Gate = int8(*s.Gate)
 	}
 	if s.Temp != nil {
-		ts.TempTarget = byte(*s.Temp)
+		ts.TempTarget = int8(*s.Temp)
 	}
 	if s.Speed != nil {
-		ts.Speed = byte(*s.Speed)
+		ts.Speed = int8(*s.Speed)
 	}
 	if s.Heater != nil {
 		ts.HeaterEnabled = *s.Heater

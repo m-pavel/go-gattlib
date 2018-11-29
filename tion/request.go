@@ -12,13 +12,13 @@ func FromStatus(s *Status) []byte {
 	return BuildRequest(s.Enabled, s.SoundEnabled, s.HeaterEnabled, s.Speed, s.Gate, s.TempTarget)
 }
 
-func BuildRequest(enabled, sound, heater bool, speed, gate, temp byte) []byte {
+func BuildRequest(enabled, sound, heater bool, speed, gate, temp int8) []byte {
 	bf := bytes.NewBufferString("")
 	bf.WriteByte(0x3d)
 	bf.WriteByte(0x02)
-	bf.WriteByte(speed)
-	bf.WriteByte(temp)
-	bf.WriteByte(gate)
+	bf.WriteByte(byte(speed))
+	bf.WriteByte(byte(temp))
+	bf.WriteByte(byte(gate))
 	flags := byte(0)
 	if heater {
 		flags |= 1
