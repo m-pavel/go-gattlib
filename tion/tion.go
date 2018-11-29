@@ -22,6 +22,7 @@ type Tion struct {
 	ls       *Status
 	sh       StatusHandler
 	interval int
+	debug    bool
 }
 
 func New(addr string, interval ...int) *Tion {
@@ -69,7 +70,7 @@ func (t *Tion) selfreconnect() error {
 	return t.g.Connect(t.Addr)
 }
 
-// ReadState witout keeping connection open
+// ReadState without keeping connection open
 // Must be not connected before execution
 func (t *Tion) ReadState(timeout ...int) (*Status, error) {
 	if t.g.Connected() {
@@ -153,6 +154,9 @@ func (t *Tion) rw() (*Status, error) {
 	if err != nil {
 		return nil, err
 	}
+	if t.debug {
+		log.Printf("RSP: %v\n", resp)
+	}
 	return FromBytes(resp)
 }
 
@@ -191,4 +195,8 @@ func (t *Tion) Off() error {
 
 func (t *Tion) Update(s *Status) error {
 	return t.g.Write(wchar, FromStatus(s))
+}
+
+func (t *Tion) Debug(v bool) {
+	t.debug = v
 }

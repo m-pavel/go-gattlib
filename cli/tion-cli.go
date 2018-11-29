@@ -18,6 +18,7 @@ func main() {
 	var device = flag.String("device", "", "bt addr")
 	var status = flag.Bool("status", true, "Request status")
 	var scanp = flag.Bool("scan", false, "Perform scan")
+	var debug = flag.Bool("debug", false, "Debug")
 	var on = flag.Bool("on", false, "Turn on")
 	var off = flag.Bool("off", false, "Turn off")
 	var temp = flag.Int("temp", 0, "Set target temperature")
@@ -33,20 +34,20 @@ func main() {
 	}
 
 	if *on {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			return t.On()
 		}, "Turned on")
 
 		return
 	}
 	if *off {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			return t.Off()
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
 			s.TempTarget = byte(*temp)
 			return t.Update(s)
@@ -59,7 +60,7 @@ func main() {
 			log.Println("Speed range 1..6")
 			return
 		}
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
 			s.Speed = byte(*speed)
 			return t.Update(s)
@@ -68,7 +69,7 @@ func main() {
 	}
 
 	if *gate != "" {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
 			s.SetGateStatus(*gate)
 			return t.Update(s)
@@ -77,7 +78,7 @@ func main() {
 	}
 
 	if *sound != "" {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
 			if *sound == "on" {
 				s.SoundEnabled = true
@@ -90,7 +91,7 @@ func main() {
 	}
 
 	if *heater != "" {
-		deviceCall(*device, func(t *tion.Tion) error {
+		deviceCall(*device, *debug, func(t *tion.Tion) error {
 			s := t.Status()
 			if *heater == "on" {
 				s.HeaterEnabled = true
@@ -126,8 +127,9 @@ func sts(b bool) string {
 	return "off"
 }
 
-func deviceCall(addr string, cb func(*tion.Tion) error, succ string) error {
+func deviceCall(addr string, dbg bool, cb func(*tion.Tion) error, succ string) error {
 	t := tion.New(addr)
+	t.Debug(dbg)
 	err := t.Connect()
 	if err != nil {
 		return err
