@@ -204,7 +204,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 				case <-time.After(expr.Sub(time.Now())):
 					log.Printf("Executing %d\n", s.Id)
 					for i := 0; i < repeat; i++ {
-						err := execute(s, device)
+						err := execute(s, device, 5, 5*time.Second)
 						if err != nil {
 							log.Println(err)
 						} else {
@@ -218,7 +218,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 	done <- struct{}{}
 }
 
-func execute(s Schedule, device string) error {
+func execute(s Schedule, device string, retry int, interval time.Duration) error {
 	t := tion.New(device)
 	err := t.Connect()
 	if err != nil {
@@ -249,11 +249,21 @@ func execute(s Schedule, device string) error {
 		ts.SoundEnabled = *s.Sound
 	}
 	log.Printf("Device request %v\n", ts)
-	err = t.Update(ts)
-	if err != nil {
-		return err
+
+	i := 0
+	for ; i < retry; i++ {
+		err = t.Update(ts)
+		if err == nil {
+			break
+		}
+		time.Sleep(interval)
 	}
-	return nil
+	if err != nil {
+		log.Printf("Device update failed after %d retries with error %v\n", i, err)
+	} else {
+		log.Printf("Device updated after %d retries.\n", i)
+	}
+	return err
 }
 
 func termHandler(sig os.Signal) error {
