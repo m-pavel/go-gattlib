@@ -21,6 +21,9 @@ var (
 	done = make(chan struct{})
 )
 
+const status = "%2d | %20s | %7s | %6s | %5s | %4s | %5s | %4s |\n"
+const statush = "ID |       SCHEDULE       | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE |\n"
+
 func main() {
 	var logf = flag.String("log", "schedule.log", "log")
 	var pid = flag.String("pid", "schedule.pid", "pid")
@@ -68,7 +71,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		fmt.Printf("ID | SCHEDULE | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE\n")
+		fmt.Printf(statush)
 
 		fi := func(v *int) string {
 			if v == nil {
@@ -83,7 +86,7 @@ func main() {
 			return tion.GateStatus(int8(*v))
 		}
 		for _, sch := range s {
-			fmt.Printf("%d | %s | %s | %s | %s | %v | %s | %s |\n", sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate))
+			fmt.Printf(status, sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate))
 		}
 		return
 	}
@@ -191,7 +194,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 		log.Println(err)
 		return
 	}
-	for i, _ := range sch {
+	for i := range sch {
 		go func(s Schedule) {
 			for {
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
