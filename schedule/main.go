@@ -21,8 +21,8 @@ var (
 	done = make(chan struct{})
 )
 
-const status = "%2d | %20s | %7s | %6s | %5s | %4s | %5s | %4s |\n"
-const statush = "ID |       SCHEDULE       | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE |\n"
+const status = "%2d | %20s | %7s | %6s | %5s | %4s | %5s | %4s | %s |\n"
+const statush = "ID |       SCHEDULE       | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE |         NEXT RUN         |\n"
 
 func main() {
 	var logf = flag.String("log", "schedule.log", "log")
@@ -86,7 +86,8 @@ func main() {
 			return tion.GateStatus(int8(*v))
 		}
 		for _, sch := range s {
-			fmt.Printf(status, sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate))
+			expr := cronexpr.MustParse(sch.Value).Next(time.Now())
+			fmt.Printf(status, sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate), expr.Format("Mon Jan _2 15:04:05 2006"))
 		}
 		return
 	}
