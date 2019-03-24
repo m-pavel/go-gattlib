@@ -25,7 +25,7 @@ const status = "%2d | %20s | %7s | %6s | %5s | %4s | %5s | %4s | %s |\n"
 const statush = "ID |       SCHEDULE       | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE |         NEXT RUN         |\n"
 
 func main() {
-	var logf = flag.String("log", "schedule.log", "log")
+	var logf = flag.String("log", "schedule.log", "log file name")
 	var pid = flag.String("pid", "schedule.pid", "pid")
 	var notdaemonize = flag.Bool("n", false, "Do not do to background.")
 	var signal = flag.String("s", "", `send signal to the daemon stop — shutdown`)
@@ -35,7 +35,8 @@ func main() {
 	var prepare = flag.Bool("prepare", false, "Prepare database")
 
 	var list = flag.Bool("list", false, "list")
-	var del = flag.Int("del", -1, "del")
+	var del = flag.Int("del", -1, "Delete entry with given ID")
+
 	var on = flag.Bool("on", false, "On")
 	var off = flag.Bool("off", false, "Off")
 	var schedule = flag.String("schedule", "", "Add schedule")
@@ -46,6 +47,8 @@ func main() {
 	var speed = flag.Int("speed", -1, "speed")
 
 	var repeat = flag.Int("repeat", 3, "repeat")
+	var summer = flag.Bool("summer", false, "summer")
+	var winter = flag.Bool("winter", false, "winter")
 
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
@@ -141,6 +144,13 @@ func main() {
 			log.Println(err)
 		}
 		return
+	}
+
+	if *summer {
+		dao.UpdateHeater(false)
+	}
+	if *winter {
+		dao.UpdateHeater(true)
 	}
 
 	log.Println("Running daemon")

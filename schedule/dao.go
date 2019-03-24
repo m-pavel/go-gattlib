@@ -84,3 +84,8 @@ func (d *Dao) Delete(id int) error {
 	_, err := d.db.Exec("DELETE FROM SCHEDULES WHERE ROWID=?", id)
 	return err
 }
+
+func (d *Dao) UpdateHeater(heater bool) error {
+	_, err := d.db.Exec("UPDATE SCHEDULES SET HEATER=?", heater)
+	return err
+}
