@@ -3,11 +3,15 @@ package main
 import (
 	"flag"
 	"log"
+	_ "net/http"
+	_ "net/http/pprof"
 	"os"
 	"syscall"
 	"time"
 
 	"fmt"
+
+	"net/http"
 
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/m-pavel/go-gattlib/tion"
@@ -64,7 +68,14 @@ func main() {
 
 }
 
+func watchdog() {
+
+}
+
 func daemonf(iserver, device string, interval int) {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	var err error
 	cli, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr: iserver,
@@ -75,17 +86,29 @@ func daemonf(iserver, device string, interval int) {
 	defer cli.Close()
 
 	t := tion.New(device)
+	c1 := make(chan *tion.Status, 1)
 	for {
 		select {
 		case <-stop:
 			log.Println("Exiting")
 			break
 		case <-time.After(time.Duration(interval) * time.Second):
-			s, err := t.ReadState(5)
-			if err != nil {
-				log.Println(err)
-			} else {
-				reportInflux(cli, s)
+			go func() {
+				s, err := t.ReadState(5)
+				if err != nil {
+					log.Println(err)
+				} else {
+					c1 <- s
+				}
+			}()
+
+			select {
+			case res := <-c1:
+				if res != nil {
+					reportInflux(cli, res)
+				}
+			case <-time.After(2 * time.Second):
+				done <- struct{}{}
 			}
 		}
 	}

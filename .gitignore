@@ -3,4 +3,5 @@ gattlib
 tion-influx
 tion-schedule
 tion-cli
+schedule.*
 
