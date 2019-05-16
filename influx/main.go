@@ -104,7 +104,7 @@ func daemonf(iserver, device string, interval int) {
 					reportInflux(cli, res)
 				}
 			case <-time.After(2 * time.Second):
-				done <- struct{}{}
+				return
 			}
 		}
 	}
