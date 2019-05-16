@@ -68,13 +68,9 @@ func main() {
 
 }
 
-func watchdog() {
-
-}
-
 func daemonf(iserver, device string, interval int) {
 	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 	var err error
 	cli, err := client.NewHTTPClient(client.HTTPConfig{
