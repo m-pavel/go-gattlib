@@ -70,21 +70,41 @@ func (t *Tion) selfreconnect() error {
 	return t.g.Connect(t.Addr)
 }
 
+type cRes struct {
+	s *Status
+	e error
+}
+
 // ReadState without keeping connection open
 // Must be not connected before execution
-func (t *Tion) ReadState(timeout ...int) (*Status, error) {
+func (t *Tion) ReadState(timeout int) (*Status, error) {
 	if t.g.Connected() {
 		return nil, errors.New("Already connected")
 	}
 	if t.sc != nil {
 		return nil, errors.New("Loop already running")
 	}
-	err := t.g.Connect(t.Addr)
-	if err != nil {
-		return nil, err
+
+	c1 := make(chan cRes, 1)
+
+	go func() {
+		err := t.g.Connect(t.Addr)
+		if err != nil {
+			c1 <- cRes{e: err}
+			return
+		}
+		defer t.g.Disconnect()
+
+		r, e := t.rw()
+		c1 <- cRes{e: e, s: r}
+	}()
+
+	select {
+	case res := <-c1:
+		return res.s, res.e
+	case <-time.After(7 * time.Second):
+		return nil, errors.New("Timeout")
 	}
-	defer t.g.Disconnect()
-	return t.rw()
 }
 
 // RegisterHandler internal loop

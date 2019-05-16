@@ -82,29 +82,18 @@ func daemonf(iserver, device string, interval int) {
 	defer cli.Close()
 
 	t := tion.New(device)
-	c1 := make(chan *tion.Status, 1)
+
 	for {
 		select {
 		case <-stop:
 			log.Println("Exiting")
 			break
 		case <-time.After(time.Duration(interval) * time.Second):
-			go func() {
-				s, err := t.ReadState(5)
-				if err != nil {
-					log.Println(err)
-				} else {
-					c1 <- s
-				}
-			}()
-
-			select {
-			case res := <-c1:
-				if res != nil {
-					reportInflux(cli, res)
-				}
-			case <-time.After(2 * time.Second):
-				return
+			s, err := t.ReadState(7)
+			if err != nil {
+				log.Println(err)
+			} else {
+				reportInflux(cli, s)
 			}
 		}
 	}

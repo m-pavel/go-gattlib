@@ -109,7 +109,7 @@ func main() {
 	}
 
 	if *status {
-		state, err := tion.New(*device).ReadState()
+		state, err := tion.New(*device).ReadState(7)
 		if err != nil {
 			log.Println(err)
 			return
