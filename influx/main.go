@@ -83,6 +83,7 @@ func daemonf(iserver, device string, interval int) {
 
 	t := tion.New(device)
 
+	erinr := 0
 	for {
 		select {
 		case <-stop:
@@ -92,8 +93,13 @@ func daemonf(iserver, device string, interval int) {
 			s, err := t.ReadState(7)
 			if err != nil {
 				log.Println(err)
+				erinr++
 			} else {
 				reportInflux(cli, s)
+				erinr = 0
+			}
+			if erinr == 10 {
+				return
 			}
 		}
 	}
