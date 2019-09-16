@@ -102,8 +102,8 @@ func (t *Tion) ReadState(timeout int) (*Status, error) {
 	select {
 	case res := <-c1:
 		return res.s, res.e
-	case <-time.After(7 * time.Second):
-		return nil, errors.New("Timeout")
+	case <-time.After(time.Duration(timeout) * time.Second):
+		return nil, errors.New("Read timeout")
 	}
 }
 

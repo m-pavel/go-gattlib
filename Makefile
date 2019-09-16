@@ -15,10 +15,13 @@ build-cli: deps
 build-influx: deps
 	${GF} go build -o tion-influx ./influx
 
+build-mqtt: deps
+	${GF} go build -o tion-mqtt ./mqtt
+
 build-schedule: deps
 	${GF} go build -o tion-schedule ./schedule
 
-build: build-cli build-influx build-schedule
+build: build-cli build-influx build-schedule build-mqtt
 
 gattlib:
 	git clone https://github.com/labapart/gattlib
