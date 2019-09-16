@@ -137,7 +137,10 @@ func (mc *mqttCli) Connect() error {
 		return token.Error()
 	}
 
-	mc.mqtt.Subscribe(mc.topicc, 0, mc.control)
+	tkn := mc.mqtt.Subscribe(mc.topicc, 0, mc.control)
+	if tkn.Error() != nil {
+		log.Println(tkn.Error())
+	}
 	mc.tion = tion.New(mc.bt)
 	return nil
 }
