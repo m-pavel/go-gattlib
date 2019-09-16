@@ -126,7 +126,7 @@ func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 
 func (mc *mqttCli) Connect() error {
 	opts := MQTT.NewClientOptions().AddBroker(mc.mqtturl)
-	opts.SetClientID("temper-go-cli")
+	opts.SetClientID("tion-go-cli")
 	if mc.user != "" {
 		opts.Username = mc.user
 		opts.Password = mc.password
