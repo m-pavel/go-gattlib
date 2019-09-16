@@ -197,7 +197,7 @@ func daemonf(mqtt, topic, topicc string, u, p string, device string, interval in
 		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 
-	mq := mqttCli{bt: device, topicc: topicc, topic: topic, user: u, password: p, interval: interval}
+	mq := mqttCli{bt: device, topicc: topicc, topic: topic, user: u, password: p, interval: interval, mqtturl: mqtt}
 	err := mq.Connect()
 	if err != nil {
 		panic(err)
