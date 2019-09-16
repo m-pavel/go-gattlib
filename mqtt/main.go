@@ -103,9 +103,14 @@ func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 		return
 	}
 
-	cs := mc.tion.Status()
+	cs, err := mc.tion.ReadState(7)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	if cs.Enabled && !req.On {
-		err = mc.tion.Off()
+		cs.Enabled = false
+		err = mc.tion.Update(cs)
 		if err != nil {
 			log.Println(err)
 		} else {
@@ -113,7 +118,8 @@ func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 		}
 	}
 	if !cs.Enabled && req.On {
-		err := mc.tion.On()
+		cs.Enabled = true
+		err = mc.tion.Update(cs)
 		if err != nil {
 			log.Println(err)
 		} else {
