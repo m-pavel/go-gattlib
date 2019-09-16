@@ -96,7 +96,6 @@ type mqttCli struct {
 
 func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 	req := Request{}
-	log.Println(msg.Payload())
 	err := json.Unmarshal(msg.Payload(), &req)
 	if err != nil {
 		log.Println(err)
@@ -126,6 +125,7 @@ func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 			log.Println("Turned on  by MQTT request")
 		}
 	}
+	mc.reportMqtt(cs)
 }
 
 func (mc *mqttCli) Connect() error {
