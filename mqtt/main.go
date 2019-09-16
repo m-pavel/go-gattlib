@@ -96,6 +96,7 @@ type mqttCli struct {
 
 func (mc *mqttCli) control(cli MQTT.Client, msg MQTT.Message) {
 	req := Request{}
+	log.Println(msg.Payload())
 	err := json.Unmarshal(msg.Payload(), &req)
 	if err != nil {
 		log.Println(err)
