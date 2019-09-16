@@ -3,3 +3,5 @@
   * Go wrapper for https://github.com/labapart/gattlib
   * Cli interface for Tion Breezer 3S 
   * Influx export daemon for Tion Breezer 3S
+  * MQTT integration for hass.io
+
