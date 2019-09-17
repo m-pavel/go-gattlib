@@ -13,7 +13,7 @@ import (
 
 	"net/http"
 
-	"github.com/influxdata/influxdb/client/v2"
+	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/m-pavel/go-gattlib/tion"
 	"github.com/sevlyar/go-daemon"
 )
