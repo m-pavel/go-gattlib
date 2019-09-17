@@ -36,3 +36,5 @@ clean: gattlib-clean
 	rm -f ./tion-influx
 	rm -f ./tion-schedule
 	rm -f ./tion-cli
+	rm -f ./tion-mqtt
+
