@@ -1,5 +1,5 @@
 CGO_CFLAGS="-I${PWD}/gattlib/include"
-CGO_LDFLAGS="-L${PWD}/gattlib/build/dbus"
+CGO_LDFLAGS="-L${PWD}/gattlib/build/dbus -lm -lutil"
 GF=CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} LD_LIBRARY_PATH=${PWD}/gattlib/build/dbus
 
 all: gattlib test build
