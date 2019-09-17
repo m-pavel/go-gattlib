@@ -26,7 +26,7 @@ func (g *Gatt) Connect(addr string) error {
 	str := C.CString(strings.ToUpper(addr))
 	defer C.free(unsafe.Pointer(str))
 	var err error
-	g.conn, err = C.gattlib_connect(nil, str, C.BDADDR_LE_PUBLIC, C.GATTLIB_CONNECTION_OPTIONS_LEGACY_BT_SEC_LOW, 0, 0)
+	g.conn, err = C.gattlib_connect(nil, str, C.GATTLIB_CONNECTION_OPTIONS_LEGACY_BDADDR_LE_PUBLIC|C.GATTLIB_CONNECTION_OPTIONS_LEGACY_BT_SEC_LOW)
 	if g.conn == nil {
 		return err
 	}
@@ -53,7 +53,8 @@ func (g *Gatt) Read(uuid string) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
-	res := C.gattlib_read_char_by_uuid(g.conn, &uuidS.uuid, unsafe.Pointer(&buffer[0]), &n)
+	ptr := unsafe.Pointer(&buffer[0])
+	res := C.gattlib_read_char_by_uuid(g.conn, &uuidS.uuid, &ptr, &n)
 	if res != 0 {
 		return nil, 0, GattError(int(res))
 	}
