@@ -51,6 +51,9 @@ func (ts TionService) Do(client MQTT.Client) (interface{}, error) {
 		return nil, err
 	}
 
+	if ts.debug {
+		log.Println(s)
+	}
 	return &Request{
 		Gate:   s.GateStatus(),
 		On:     s.Enabled,
