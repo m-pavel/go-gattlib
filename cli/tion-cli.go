@@ -120,7 +120,10 @@ func main() {
 
 func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
 	t := tion_gatt.New(addr, dbg)
-
+	if err := t.Connect(); err != nil {
+		return err
+	}
+	defer t.Disconnect()
 	s, err := t.ReadState(timeout)
 	if err != nil {
 		return err

@@ -234,7 +234,10 @@ func daemonf(device string, dao *Dao, repeat int) {
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
 	t := tion_gatt.New(device)
-
+	if err := t.Connect(); err != nil {
+		return err
+	}
+	defer t.Disconnect()
 	ts, err := t.ReadState(7)
 	if err != nil {
 		return err
