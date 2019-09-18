@@ -109,7 +109,13 @@ func main() {
 	}
 
 	if *status {
-		state, err := tion_gatt.New(*device).ReadState(7)
+		t := tion_gatt.New(*device, *debug)
+		if err := t.Connect(); err != nil {
+			log.Println(err)
+			return
+		}
+		defer t.Disconnect()
+		state, err := t.ReadState(timeout)
 		if err != nil {
 			log.Println(err)
 			return
