@@ -52,7 +52,7 @@ func (ts TionService) Do(client MQTT.Client) (interface{}, error) {
 	}
 
 	if ts.debug {
-		log.Println(s)
+		log.Println(s.BeautyString())
 	}
 	return &Request{
 		Gate:   s.GateStatus(),
