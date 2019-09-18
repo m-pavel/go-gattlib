@@ -4,6 +4,8 @@ import (
 	"log"
 	"time"
 
+	"sync"
+
 	"github.com/go-errors/errors"
 	"github.com/m-pavel/go-gattlib/pkg"
 	tion2 "github.com/m-pavel/go-gattlib/tion"
@@ -18,10 +20,11 @@ type tion struct {
 	g     *gattlib.Gatt
 	Addr  string
 	debug bool
+	mutex *sync.Mutex
 }
 
 func New(addr string, debug ...bool) tion2.Tion {
-	t := tion{Addr: addr, g: &gattlib.Gatt{}}
+	t := tion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}}
 	if len(debug) == 1 && debug[0] {
 		t.debug = true
 	}
@@ -34,6 +37,9 @@ type cRes struct {
 }
 
 func (t *tion) ReadState(timeout int) (*tion2.Status, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.g.Connected() {
 		return nil, errors.New("Already connected")
 	}
@@ -76,6 +82,24 @@ func (t *tion) rw() (*tion2.Status, error) {
 	return tion2.FromBytes(resp)
 }
 
-func (t *tion) Update(s *tion2.Status) error {
-	return t.g.Write(wchar, tion2.FromStatus(s))
+func (t *tion) Update(s *tion2.Status, timeout int) error {
+	c1 := make(chan error, 1)
+
+	go func() {
+		err := t.g.Connect(t.Addr)
+		if err != nil {
+			c1 <- err
+			return
+		}
+		defer t.g.Disconnect()
+
+		c1 <- t.g.Write(wchar, tion2.FromStatus(s))
+	}()
+
+	select {
+	case res := <-c1:
+		return res
+	case <-time.After(time.Duration(timeout) * time.Second):
+		return errors.New("Write timeout")
+	}
 }

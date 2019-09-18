@@ -11,7 +11,7 @@ func NewFake() Tion {
 func (ft fakeTion) ReadState(tmt int) (*Status, error) {
 	return &ft.s, nil
 }
-func (ft *fakeTion) Update(s *Status) error {
+func (ft *fakeTion) Update(s *Status, tmt int) error {
 	ft.s = *s
 	return nil
 }

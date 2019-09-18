@@ -262,7 +262,7 @@ func execute(s Schedule, device string, retry int, interval time.Duration) error
 
 	i := 0
 	for ; i < retry; i++ {
-		err = t.Update(ts)
+		err = t.Update(ts, 7)
 		if err == nil {
 			break
 		}

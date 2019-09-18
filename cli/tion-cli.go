@@ -39,7 +39,7 @@ func main() {
 	if *on {
 		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = true
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, "Turned on")
 
 		return
@@ -47,14 +47,14 @@ func main() {
 	if *off {
 		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = false
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
 		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.TempTarget = int8(*temp)
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
 		return
 	}
@@ -66,7 +66,7 @@ func main() {
 		}
 		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.Speed = int8(*speed)
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
 		return
 	}
@@ -74,7 +74,7 @@ func main() {
 	if *gate != "" {
 		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.SetGateStatus(*gate)
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, fmt.Sprintf("Gate set to %s", *gate))
 		return
 	}
@@ -86,7 +86,7 @@ func main() {
 			} else {
 				s.SoundEnabled = false
 			}
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, fmt.Sprintf("Sound set to %s", *sound))
 		return
 	}
@@ -98,7 +98,7 @@ func main() {
 			} else {
 				s.HeaterEnabled = false
 			}
-			return t.Update(s)
+			return t.Update(s, timeout)
 		}, fmt.Sprintf("Heater set to %s", *heater))
 		return
 	}

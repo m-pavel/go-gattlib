@@ -1,6 +1,6 @@
 package tion
 
 type Tion interface {
-	ReadState(tmt int) (*Status, error)
-	Update(s *Status) error
+	ReadState(timeout int) (*Status, error)
+	Update(s *Status, timeout int) error
 }

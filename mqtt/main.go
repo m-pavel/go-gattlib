@@ -97,7 +97,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	if cs.Enabled {
 		if !req.On {
 			cs.Enabled = false
-			err = ts.t.Update(cs)
+			err = ts.t.Update(cs, 7)
 			if err != nil {
 				log.Println(err)
 			} else {
@@ -110,7 +110,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	} else {
 		if req.On {
 			cs.Enabled = true
-			err = ts.t.Update(cs)
+			err = ts.t.Update(cs, 7)
 			if err != nil {
 				log.Println(err)
 			} else {
