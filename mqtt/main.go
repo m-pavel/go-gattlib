@@ -63,7 +63,7 @@ func (ts TionService) Do(client MQTT.Client) (interface{}, error) {
 	}, nil
 }
 
-func (ts TionService) control(cli MQTT.Client, msg MQTT.Message) {
+func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	req := Request{}
 	err := json.Unmarshal(msg.Payload(), &req)
 	if err != nil {
