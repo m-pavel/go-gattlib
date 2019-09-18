@@ -83,6 +83,8 @@ func (t *tion) rw() (*tion2.Status, error) {
 }
 
 func (t *tion) Update(s *tion2.Status, timeout int) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 	c1 := make(chan error, 1)
 
 	go func() {
