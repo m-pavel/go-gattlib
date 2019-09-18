@@ -68,6 +68,9 @@ func (ts TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(err)
 		return
 	}
+	if ts.debug {
+		log.Println(req)
+	}
 
 	cs, err := ts.t.ReadState(7)
 	if err != nil {
@@ -92,9 +95,7 @@ func (ts TionService) control(cli MQTT.Client, msg MQTT.Message) {
 			log.Println("Turned on  by MQTT request")
 		}
 	}
-	if ts.debug {
-		log.Println(req)
-	}
+
 	ts.ss()
 }
 
