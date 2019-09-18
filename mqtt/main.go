@@ -7,8 +7,6 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
-	"os"
-
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-gattlib/tion"
 	"github.com/m-pavel/go-gattlib/tion-gatt"
@@ -38,7 +36,7 @@ func (ts *TionService) PrepareCommandLineParams() {
 	ts.bt = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
 	ts.fake = flag.Bool("fake", false, "Fake device")
 }
-func (ts TionService) Name() string { return "tion2" }
+func (ts TionService) Name() string { return "tion" }
 
 func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
 	if *ts.fake {
@@ -51,14 +49,14 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 	ts.debug = debug
 	ts.ss = ss
 
-	if token := client.Subscribe(topicc, 0, ts.control); token.Error() != nil {
+	if token := client.Subscribe(topicc, 2, ts.control); token.Error() != nil {
 		return token.Error()
 	}
 
 	return nil
 }
 
-func (ts TionService) Do(client MQTT.Client) (interface{}, error) {
+func (ts TionService) Do() (interface{}, error) {
 	s, err := ts.t.ReadState(7)
 	if err != nil {
 		return nil, err
@@ -131,9 +129,5 @@ func (ts TionService) Close() error {
 }
 
 func main() {
-	MQTT.DEBUG = log.New(os.Stderr, "DEBUG    ", log.Ltime|log.Lshortfile)
-	MQTT.WARN = log.New(os.Stderr, "WARNING  ", log.Ltime|log.Lshortfile)
-	MQTT.CRITICAL = log.New(os.Stderr, "CRITICAL ", log.Ltime|log.Lshortfile)
-	MQTT.ERROR = log.New(os.Stderr, "ERROR    ", log.Ltime|log.Lshortfile)
 	ghm.NewStub(&TionService{}).Main()
 }
