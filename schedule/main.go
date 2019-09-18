@@ -11,8 +11,8 @@ import (
 
 	"fmt"
 
-	"github.com/go-errors/errors"
 	"github.com/gorhill/cronexpr"
+	"github.com/m-pavel/go-gattlib/tion-gatt"
 	"github.com/sevlyar/go-daemon"
 )
 
@@ -233,15 +233,11 @@ func daemonf(device string, dao *Dao, repeat int) {
 }
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
-	t := tion.New(device)
-	err := t.Connect()
+	t := tion_gatt.New(device)
+
+	ts, err := t.ReadState(7)
 	if err != nil {
 		return err
-	}
-	defer t.Disconnect()
-	ts := t.Status()
-	if ts == nil {
-		return errors.New("Status is nil")
 	}
 
 	if s.Enabled != nil {

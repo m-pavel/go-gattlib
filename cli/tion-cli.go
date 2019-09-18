@@ -12,7 +12,10 @@ import (
 	"fmt"
 
 	"github.com/m-pavel/go-gattlib/tion"
+	"github.com/m-pavel/go-gattlib/tion-gatt"
 )
+
+const timeout = 7
 
 func main() {
 	var device = flag.String("device", "", "bt addr")
@@ -34,21 +37,22 @@ func main() {
 	}
 
 	if *on {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			return t.On()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+			s.Enabled = true
+			return t.Update(s)
 		}, "Turned on")
 
 		return
 	}
 	if *off {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			return t.Off()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+			s.Enabled = false
+			return t.Update(s)
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			s := t.Status()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.TempTarget = int8(*temp)
 			return t.Update(s)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
@@ -60,8 +64,7 @@ func main() {
 			log.Println("Speed range 1..6")
 			return
 		}
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			s := t.Status()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.Speed = int8(*speed)
 			return t.Update(s)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
@@ -69,8 +72,7 @@ func main() {
 	}
 
 	if *gate != "" {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			s := t.Status()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			s.SetGateStatus(*gate)
 			return t.Update(s)
 		}, fmt.Sprintf("Gate set to %s", *gate))
@@ -78,8 +80,7 @@ func main() {
 	}
 
 	if *sound != "" {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			s := t.Status()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			if *sound == "on" {
 				s.SoundEnabled = true
 			} else {
@@ -91,8 +92,7 @@ func main() {
 	}
 
 	if *heater != "" {
-		deviceCall(*device, *debug, func(t *tion.Tion) error {
-			s := t.Status()
+		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
 			if *heater == "on" {
 				s.HeaterEnabled = true
 			} else {
@@ -109,7 +109,7 @@ func main() {
 	}
 
 	if *status {
-		state, err := tion.New(*device).ReadState(7)
+		state, err := tion_gatt.New(*device).ReadState(7)
 		if err != nil {
 			log.Println(err)
 			return
@@ -118,15 +118,15 @@ func main() {
 	}
 }
 
-func deviceCall(addr string, dbg bool, cb func(*tion.Tion) error, succ string) error {
-	t := tion.New(addr)
-	t.Debug(dbg)
-	err := t.Connect()
+func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
+	t := tion_gatt.New(addr, dbg)
+
+	s, err := t.ReadState(timeout)
 	if err != nil {
 		return err
 	}
-	defer t.Disconnect()
-	err = cb(t)
+
+	err = cb(t, s)
 	if err != nil {
 		log.Println(err)
 	} else {

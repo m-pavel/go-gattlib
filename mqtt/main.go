@@ -9,6 +9,7 @@ import (
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-gattlib/tion"
+	"github.com/m-pavel/go-gattlib/tion-gatt"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
 )
 
@@ -24,24 +25,34 @@ type Request struct {
 }
 
 type TionService struct {
-	t     *tion.Tion
+	t     tion.Tion
 	bt    *string
 	debug bool
+	fake  *bool
 	ss    ghm.SendState
 }
 
 func (ts *TionService) PrepareCommandLineParams() {
 	ts.bt = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
+	ts.fake = flag.Bool("fake", false, "Fake device")
 }
 func (ts TionService) Name() string { return "tion" }
 
 func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
-	ts.t = tion.New(*ts.bt)
-	if token := client.Subscribe(topicc, 0, ts.control); token.Error() != nil {
-		return token.Error()
+	if *ts.fake {
+		log.Println("Using fake device.")
+		ts.t = tion.NewFake()
+	} else {
+		ts.t = tion_gatt.New(*ts.bt, debug)
 	}
+
 	ts.debug = debug
 	ts.ss = ss
+
+	if token := client.Subscribe(topicc, 2, ts.control); token.Error() != nil {
+		return token.Error()
+	}
+
 	return nil
 }
 
@@ -114,7 +125,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 }
 
 func (ts TionService) Close() error {
-	return ts.t.Disconnect()
+	return nil
 }
 
 func main() {
