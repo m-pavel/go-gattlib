@@ -37,7 +37,9 @@ func (ts TionService) Name() string { return "tion" }
 
 func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
 	ts.t = tion.New(*ts.bt)
-	client.Subscribe(topicc, 0, ts.control)
+	if token := client.Subscribe(topicc, 0, ts.control); token.Error() != nil {
+		return token.Error()
+	}
 	ts.debug = debug
 	ts.ss = ss
 	return nil
