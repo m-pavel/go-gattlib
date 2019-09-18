@@ -6,6 +6,7 @@ package gattlib
 // #include <stdlib.h>
 import "C"
 import (
+	"fmt"
 	"strings"
 	"unsafe"
 )
@@ -56,7 +57,8 @@ func (g *Gatt) Read(uuid string) ([]byte, int, error) {
 		return nil, 0, GattError(int(res))
 	}
 
-	buffer := C.GoBytes(unsafe.Pointer(*(**C.uchar)(ptr)), C.int(n))
+	buffer := C.GoBytes(ptr, C.int(n))
+	fmt.Println(n)
 	return buffer, int(n), nil
 }
 

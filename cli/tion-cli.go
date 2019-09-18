@@ -115,7 +115,7 @@ func main() {
 			return
 		}
 		log.Printf("Status: %s, Heater: %s, Sound: %s\n", sts(state.Enabled), sts(state.HeaterEnabled), sts(state.SoundEnabled))
-		log.Printf("Target: %d \u2103, In: %d \u2103, Out: %d \u2103\n", state.TempTarget, state.TempIn, state.TempOut)
+		log.Printf("Target: %d C, In: %d C, Out: %d C\n", state.TempTarget, state.TempIn, state.TempOut)
 		log.Printf("Speed %d, Gate: %s, Error: %d\n", state.Speed, state.GateStatus(), state.ErrorCode)
 	}
 }
