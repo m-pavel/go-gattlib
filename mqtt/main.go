@@ -99,6 +99,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	}
 
 	ts.ss()
+	log.Println("Control done.")
 }
 
 func (ts TionService) Close() error {
