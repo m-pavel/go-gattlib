@@ -107,7 +107,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 				log.Println("Turned on  by MQTT request")
 			}
 		} else {
-			log.Println("Already on")
+			log.Println("Already off")
 		}
 	}
 	log.Println("Control done.")
