@@ -11,6 +11,7 @@ import (
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-gattlib/tion"
+	"github.com/m-pavel/go-gattlib/tion-gatt"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
 )
 
