@@ -54,6 +54,7 @@ func (g *Gatt) Read(uuid string) ([]byte, int, error) {
 	}
 
 	ptr := unsafe.Pointer(&buffer[0])
+	ptr = unsafe.Pointer(ptr)
 	res := C.gattlib_read_char_by_uuid(g.conn, &uuidS.uuid, &ptr, &n)
 	if res != 0 {
 		return nil, 0, GattError(int(res))
