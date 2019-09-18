@@ -27,6 +27,7 @@ type TionService struct {
 	t     *tion.Tion
 	bt    *string
 	debug bool
+	ss    ghm.SendState
 }
 
 func (ts *TionService) PrepareCommandLineParams() {
@@ -34,10 +35,11 @@ func (ts *TionService) PrepareCommandLineParams() {
 }
 func (ts TionService) Name() string { return "tion" }
 
-func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool) error {
+func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
 	ts.t = tion.New(*ts.bt)
 	client.Subscribe(topicc, 0, ts.control)
 	ts.debug = debug
+	ts.ss = ss
 	return nil
 }
 
@@ -93,7 +95,7 @@ func (ts TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	if ts.debug {
 		log.Println(req)
 	}
-	//mc.reportMqtt(cs)
+	ts.ss()
 }
 
 func (ts TionService) Close() error {
