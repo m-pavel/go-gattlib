@@ -57,6 +57,8 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 }
 
 func (ts TionService) Do() (interface{}, error) {
+	ts.t.Connect()
+	defer ts.t.Disconnect()
 	s, err := ts.t.ReadState(7)
 	if err != nil {
 		return nil, err
@@ -88,6 +90,8 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(req)
 	}
 
+	ts.t.Connect()
+	defer ts.t.Disconnect()
 	cs, err := ts.t.ReadState(7)
 	if err != nil {
 		log.Println(err)

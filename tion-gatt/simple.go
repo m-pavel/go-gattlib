@@ -36,24 +36,34 @@ type cRes struct {
 	e error
 }
 
+func (t *tion) Connect() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+	if t.g.Connected() {
+		return errors.New("Tion already connected")
+	}
+	return t.g.Connect(t.Addr)
+}
+func (t *tion) Disconnect() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+	if t.g.Connected() {
+		return errors.New("Tion already disconnected")
+	}
+	return t.g.Disconnect()
+}
+
 func (t *tion) ReadState(timeout int) (*tion2.Status, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	if t.g.Connected() {
-		return nil, errors.New("Already connected")
+	if !t.g.Connected() {
+		return nil, errors.New("Tion not connected")
 	}
 
 	c1 := make(chan cRes, 1)
 
 	go func() {
-		err := t.g.Connect(t.Addr)
-		if err != nil {
-			c1 <- cRes{e: err}
-			return
-		}
-		defer t.g.Disconnect()
-
 		r, e := t.rw()
 		c1 <- cRes{e: e, s: r}
 	}()
@@ -85,16 +95,14 @@ func (t *tion) rw() (*tion2.Status, error) {
 func (t *tion) Update(s *tion2.Status, timeout int) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
+
+	if !t.g.Connected() {
+		return errors.New("Tion not connected")
+	}
+
 	c1 := make(chan error, 1)
 
 	go func() {
-		err := t.g.Connect(t.Addr)
-		if err != nil {
-			c1 <- err
-			return
-		}
-		defer t.g.Disconnect()
-
 		c1 <- t.g.Write(wchar, tion2.FromStatus(s))
 	}()
 
