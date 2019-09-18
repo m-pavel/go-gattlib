@@ -114,17 +114,8 @@ func main() {
 			log.Println(err)
 			return
 		}
-		log.Printf("Status: %s, Heater: %s, Sound: %s\n", sts(state.Enabled), sts(state.HeaterEnabled), sts(state.SoundEnabled))
-		log.Printf("Target: %d C, In: %d C, Out: %d C\n", state.TempTarget, state.TempIn, state.TempOut)
-		log.Printf("Speed %d, Gate: %s, Error: %d\n", state.Speed, state.GateStatus(), state.ErrorCode)
+		log.Println(state.BeautyString())
 	}
-}
-
-func sts(b bool) string {
-	if b {
-		return "on"
-	}
-	return "off"
 }
 
 func deviceCall(addr string, dbg bool, cb func(*tion.Tion) error, succ string) error {

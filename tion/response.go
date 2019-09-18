@@ -3,6 +3,8 @@ package tion
 import (
 	bytes2 "bytes"
 
+	"fmt"
+
 	"github.com/go-errors/errors"
 )
 
@@ -51,6 +53,20 @@ func (s *Status) SetGateStatus(str string) {
 	case "outdoor":
 		s.Gate = 2
 	}
+}
+
+func (s Status) BeautyString() string {
+	return fmt.Sprintf("Status: %s, Heater: %s, Sound: %s\nTarget: %d C, In: %d C, Out: %d C\nSpeed %d, Gate: %s, Error: %d\n",
+		sts(s.Enabled), sts(s.HeaterEnabled), sts(s.SoundEnabled),
+		s.TempTarget, s.TempIn, s.TempOut,
+		s.Speed, s.GateStatus(), s.ErrorCode)
+}
+
+func sts(b bool) string {
+	if b {
+		return "on"
+	}
+	return "off"
 }
 
 func FromBytes(bytes []byte) (*Status, error) {
