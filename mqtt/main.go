@@ -82,26 +82,34 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(err)
 		return
 	}
-	if cs.Enabled && !req.On {
-		cs.Enabled = false
-		err = ts.t.Update(cs)
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Println("Turned off by MQTT request")
-		}
-	}
-	if !cs.Enabled && req.On {
-		cs.Enabled = true
-		err = ts.t.Update(cs)
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Println("Turned on  by MQTT request")
-		}
-	}
 
-	ts.ss()
+	if cs.Enabled {
+		if !req.On {
+			cs.Enabled = false
+			err = ts.t.Update(cs)
+			if err != nil {
+				log.Println(err)
+			} else {
+				ts.ss()
+				log.Println("Turned off by MQTT request")
+			}
+		} else {
+			log.Println("Already on")
+		}
+	} else {
+		if req.On {
+			cs.Enabled = true
+			err = ts.t.Update(cs)
+			if err != nil {
+				log.Println(err)
+			} else {
+				ts.ss()
+				log.Println("Turned on  by MQTT request")
+			}
+		} else {
+			log.Println("Already on")
+		}
+	}
 	log.Println("Control done.")
 }
 
