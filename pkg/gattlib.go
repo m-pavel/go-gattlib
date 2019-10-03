@@ -27,7 +27,7 @@ func (g *Gatt) Connect(addr string) error {
 	defer C.free(unsafe.Pointer(str))
 	var err error
 	g.conn, err = C.gattlib_connect(nil, str, C.GATTLIB_CONNECTION_OPTIONS_LEGACY_BDADDR_LE_PUBLIC|C.GATTLIB_CONNECTION_OPTIONS_LEGACY_BT_SEC_LOW)
-	if g.conn == nil {
+	if g.conn == nil || err != nil {
 		return err
 	}
 	return nil
